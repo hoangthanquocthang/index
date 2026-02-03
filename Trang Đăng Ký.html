@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Trang đăng ký</title>
+  <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .register-container { background: white; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.18); overflow: hidden; width: 100%; max-width: 520px; }
+        .register-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 36px 30px; text-align: center; }
+        .register-header h1 { font-size: 1.8em; margin-bottom: 6px; }
+        .register-header p { opacity: 0.95; }
+        .register-form { padding: 28px 30px; }
+        .form-row { display: flex; gap: 12px; }
+        .form-group { margin-bottom: 18px; width: 100%; }
+        label { display:block; margin-bottom:8px; color:#333; font-weight:600; }
+        input[type='text'], input[type='email'], input[type='password'] { width:100%; padding:12px 14px; border:2px solid #e7e9f8; border-radius:8px; background:#fafbff; transition: all 0.2s ease; }
+        input:focus { outline:none; border-color:#667eea; background: #fff; box-shadow: 0 6px 18px rgba(102,126,234,0.08); }
+        .actions { display:flex; gap:10px; align-items:center; }
+        .btn { padding:12px 16px; border-radius:8px; border:0; background:#667eea; color:white; font-weight:700; cursor:pointer; flex:1; }
+        .btn.secondary { background: #fff; color:#334; border:1px solid #e6e9ff; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+        .msg { padding:12px; border-radius:8px; margin-bottom:14px; display:none; }
+        .msg.error { background:#fee; color:#c00; border-left:4px solid #c00; }
+        .msg.success { background:#efe; color:#0a0; border-left:4px solid #0a0; }
+        .small { font-size:0.92em; color:#666; text-align:center; margin-top:12px; }
+        @media (max-width:480px){ .register-container { margin:16px; } .form-row { flex-direction:column; } }
+  </style>
+</head>
+<body>
+  <main class="register-container" role="main">
+    <div class="register-header">
+      <h1>📝 Đăng Ký</h1>
+      <p>Tạo tài khoản để quản lý thời khóa biểu của bạn</p>
+    </div>
+
+    <form class="register-form" id="registerForm" novalidate>
+      <div id="errorBox" class="msg error" aria-live="polite"></div>
+      <div id="successBox" class="msg success" aria-live="polite"></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fullname">Họ và tên</label>
+          <input id="fullname" name="fullname" type="text" required placeholder="Nguyễn Văn A">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="email@vd.com">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="username">Tên đăng nhập</label>
+          <input id="username" name="username" type="text" required placeholder="tai_khoan123">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Mật khẩu</label>
+          <input id="password" name="password" type="password" required placeholder="Ít nhất 6 ký tự">
+        </div>
+        <div class="form-group">
+          <label for="password2">Xác nhận mật khẩu</label>
+          <input id="password2" name="password2" type="password" required placeholder="Nhập lại mật khẩu">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn">Đăng ký</button>
+        <button type="button" class="btn secondary" onclick="window.location.href='Trang Đăng Nhập.html'">Quay về Đăng nhập</button>
+      </div>
+
+      <div class="small">Hoặc <a href="Trang Đăng Nhập.html">Đăng nhập</a></div>
+    </form>
+  </main>
+
+  <script>
+    
+    const form = document.getElementById('registerForm');
+    const err = document.getElementById('errorBox');
+    const succ = document.getElementById('successBox');
+
+    function showError(msg){ err.style.display='block'; err.textContent = msg }
+    function clearError(){ err.style.display='none'; err.textContent = '' }
+    function showSuccess(msg){ succ.style.display='block'; succ.textContent = msg }
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault(); clearError(); succ.style.display='none';
+      const fullname = form.fullname.value.trim();
+      const email = form.email.value.trim();
+      const username = form.username.value.trim();
+      const password = form.password.value;
+      const password2 = form.password2.value;
+
+      if(!fullname || !email || !username || !password || !password2){ showError('Vui lòng điền đầy đủ thông tin bắt buộc.'); return }
+      if(password.length < 6){ showError('Mật khẩu phải có ít nhất 6 ký tự.'); return }
+      if(password !== password2){ showError('Mật khẩu và xác nhận không khớp.'); return }
+      // simple email test
+      const re = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      if(!re.test(email)){ showError('Email không hợp lệ.'); return }
+
+      try {
+        const raw = localStorage.getItem('users') || '{}';
+        const users = JSON.parse(raw);
+        if (users[username]) { showError('Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.'); return; }
+        users[username] = { password, email, fullname };
+        localStorage.setItem('users', JSON.stringify(users));
+        // Lưu tạm thông tin vừa đăng ký để trang đăng nhập có thể tự điền
+        try { localStorage.setItem('lastRegistered', JSON.stringify({ username, password })); } catch(e) {}
+        // Thiết lập currentUser để tự đăng nhập sau khi đăng ký
+        try { localStorage.setItem('currentUser', JSON.stringify({ username })); } catch(e) {}
+        console.log('Đã lưu tài khoản:', users[username]);
+        showSuccess('Đăng ký thành công! Đang đăng nhập tự động...');
+        form.reset();
+        setTimeout(()=>{ window.location.href = 'Giới Thiệu Bản Thân.html'; }, 800);
+      } catch (err) {
+        console.error(err);
+        showError('Không thể lưu tài khoản (localStorage thất bại).');
+      }
+    })
+
+</body>
+</html>
